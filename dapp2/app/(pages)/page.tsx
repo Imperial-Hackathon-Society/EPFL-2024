@@ -9,7 +9,6 @@ export default function LoginPage() {
   const router = useRouter();
   const { user, isLoading } = useZkLoginSession();
 
-
   return (
     <div className="centered" style={{ width: "100%" }} id="maindiv">
       <div className="horizontal">
@@ -42,7 +41,21 @@ export default function LoginPage() {
               }}
               className="button"
             >
-              Continue
+              Continue as Patient
+            </button>
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                document.getElementById("maindiv")!.style.animation =
+                  "fadeout 1s forwards";
+                e.currentTarget.style.pointerEvents = "none";
+                setTimeout(() => {
+                  router.push("/doctor");
+                }, 1020);
+              }}
+              className="button"
+            >
+              Continue as Doctor
             </button>
             <div id="connect">
               <button
