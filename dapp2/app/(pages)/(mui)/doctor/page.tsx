@@ -16,26 +16,25 @@ import {
 export default function DoctorPage() {
   function FormButton({ name, x }: { name: string; x: number }) {
     return (
-      <Grid size={6}>
-        <FormControl>
-          <FormLabel>
-            <Typography sx={{ fontSize: "1.3rem" }}>{name}</Typography>
-          </FormLabel>
-          <Input
-            type="number"
-            sx={{ pointerEvents: "all" }}
-            name={name}
-            defaultValue={x}
-            required
-            slotProps={{
-              input: {
-                min: 0,
-                max: 1,
-              },
-            }}
-          />
-        </FormControl>
-      </Grid>
+      <FormControl>
+        <FormLabel>
+          <Typography sx={{ fontSize: "1.3rem" }}>{name}</Typography>
+        </FormLabel>
+        <Input
+          type="number"
+          sx={{ pointerEvents: "all" }}
+          name={name}
+          defaultValue={x}
+          required
+          slotProps={{
+            input: {
+              min: 0,
+              max: 1,
+              step: 0.01,
+            },
+          }}
+        />
+      </FormControl>
     );
   }
 
@@ -89,7 +88,22 @@ export default function DoctorPage() {
                 const formJson = Object.fromEntries(
                   (formData as any).entries()
                 );
-                alert(JSON.stringify(formJson));
+                const val = Object.values(formJson).map(parseFloat);
+
+                fetch("http://localhost:5001", {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify({ value: val }),
+                })
+                  .then((response) => response.json())
+                  .then((data) => {
+                    console.log("Success:", data);
+                  })
+                  .catch((error) => {
+                    console.error("Error:", error);
+                  });
               }}
             >
               <Grid container spacing={2} sx={{ flexGrow: 1 }}>
