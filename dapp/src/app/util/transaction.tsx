@@ -5,14 +5,14 @@ const PACKAGE_ID =
 
 function send(
   signAndExecute: any,
-  args: any[],
+  args: (tx: Transaction) => any[],
   target: string,
   gasBudget: bigint,
   onSuccess: (result: any) => void
 ) {
   const tx = new Transaction();
   tx.moveCall({
-    arguments: args,
+    arguments: args(tx),
     target: `${PACKAGE_ID}::${target}`,
   });
   tx.setGasBudget(gasBudget);

@@ -1,15 +1,28 @@
-'use client';
-import createCache from '@emotion/cache';
-import { useServerInsertedHTML } from 'next/navigation';
-import { CacheProvider } from '@emotion/react';
-import { CssVarsProvider } from '@mui/joy/styles';
-import CssBaseline from '@mui/joy/CssBaseline';
-import React from 'react';
+"use client";
+import createCache from "@emotion/cache";
+import { useServerInsertedHTML } from "next/navigation";
+import { CacheProvider } from "@emotion/react";
+import { CssVarsProvider, extendTheme } from "@mui/joy/styles";
+import CssBaseline from "@mui/joy/CssBaseline";
+import { useState } from "react";
+
+const theme = extendTheme({
+  colorSchemes: {
+    light: {
+      palette: {
+        background: {
+          body: "#dbdbdb",
+          backdrop: "#dbdbdb",
+        },
+      },
+    },
+  },
+});
 
 export default function ThemeRegistry(props: any) {
   const { options, children } = props;
 
-  const [{ cache, flush }] = React.useState(() => {
+  const [{ cache, flush }] = useState(() => {
     const cache = createCache(options);
     cache.compat = true;
     const prevInsert = cache.insert;
@@ -34,14 +47,14 @@ export default function ThemeRegistry(props: any) {
     if (names.length === 0) {
       return null;
     }
-    let styles = '';
+    let styles = "";
     for (const name of names) {
       styles += cache.inserted[name];
     }
     return (
       <style
         key={cache.key}
-        data-emotion={`${cache.key} ${names.join(' ')}`}
+        data-emotion={`${cache.key} ${names.join(" ")}`}
         dangerouslySetInnerHTML={{
           __html: styles,
         }}
@@ -51,7 +64,7 @@ export default function ThemeRegistry(props: any) {
 
   return (
     <CacheProvider value={cache}>
-      <CssVarsProvider>
+      <CssVarsProvider theme={theme}>
         <CssBaseline />
         {children}
       </CssVarsProvider>

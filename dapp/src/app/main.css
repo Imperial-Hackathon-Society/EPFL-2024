@@ -1,0 +1,148 @@
+@import url("https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wdth,wght,YTLC@0,6..12,75..125,200..1000,440..540;1,6..12,75..125,200..1000,440..540&display=swap");
+
+:root {
+  --color-bg: #dbdbdb;
+  --color-primary: #262623;
+  --color-secondary: #0000cd;
+  font-family: 'Nunito Sans', sans-serif;
+}
+
+* {
+  pointer-events: none;
+}
+
+body {
+  margin: 0;
+  background-color: var(--color-bg);
+
+  overflow: hidden;
+}
+
+canvas.bg {
+  position: absolute;
+  z-index: -1;
+  pointer-events: all;
+}
+
+.centered {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+h1 {
+  font-family: var(--font-horizon);
+  font-size: 8rem;
+  font-weight: 900;
+  margin-bottom: 0;
+}
+
+h4 {
+  font-size: 3rem;
+  font-weight: 700;
+  color: var(--color-secondary);
+  text-align: center;
+  margin-top: 0;
+}
+
+.plus {
+  position: relative;
+  display: inline-block;
+  width: 70px;
+  height: 70px;
+}
+
+.plus-x {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 70px;
+  height: 5px;
+  background-color: var(--color-primary);
+}
+
+.plus-y {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 5px;
+  height: 70px;
+  background-color: var(--color-primary);
+}
+
+.horizontal {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 15rem;
+}
+
+button {
+  pointer-events: painted;
+}
+
+.button-group {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+}
+
+.button {
+  display: inline-block;
+  padding: 1rem 2rem;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-bg);
+  background-color: var(--color-primary);
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: transform 0.3s;
+  transform-style: preserve-3d;
+}
+
+.button:hover {
+  background-color: var(--color-secondary);
+  transform: translateY(-5px);
+}
+
+.background {
+  /* Background as image from public/wavebg.png, cover screen */
+  background-image: url("/wavebg.png");
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  opacity: 0.2;
+}
+
+.fadein {
+  animation: fadein 1s forwards;
+}
+
+@keyframes fadein {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeout {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}

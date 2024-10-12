@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
-import "@fontsource/inter";
+import "./main.css";
 import "@mysten/dapp-kit/dist/index.css";
-import ThemeRegistry from "./components/ThemeRegistry";
 import SuiRegistry from "./components/SuiRegistry";
+import localFont from 'next/font/local'
+
+export const horizon = localFont({ src: './font/horizon.otf', variable: '--font-horizon', })
 
 export const metadata: Metadata = {
   title: "Life Premium",
@@ -16,10 +18,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>
-        <SuiRegistry>
-          <ThemeRegistry options={{ key: "joy" }}>{children}</ThemeRegistry>
-        </SuiRegistry>
+      <body className={horizon.variable}>
+        <SuiRegistry>{children}</SuiRegistry>
       </body>
     </html>
   );
