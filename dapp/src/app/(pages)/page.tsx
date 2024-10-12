@@ -1,11 +1,14 @@
 "use client";
 
 import {
+  useAccounts,
   useConnectWallet,
   useCurrentAccount,
   useDisconnectWallet,
   useWallets,
 } from "@mysten/dapp-kit";
+import { LOGIN_PAGE_PATH } from "@shinami/nextjs-zklogin";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
@@ -67,20 +70,13 @@ export default function LoginPage() {
           </>
         ) : (
           <div id="connect">
-            <button
-              onClick={(e) => {
-                e.preventDefault();
-                connect(
-                  { wallet: wallet[0] },
-                  {
-                    onSuccess: () => console.log("connected"),
-                  }
-                );
-              }}
+            <Link
+              href={LOGIN_PAGE_PATH}
               className="button"
+              style={{pointerEvents: "all", textDecoration: "none"}}
             >
               Log in
-            </button>
+            </Link>
           </div>
         )}
       </div>
