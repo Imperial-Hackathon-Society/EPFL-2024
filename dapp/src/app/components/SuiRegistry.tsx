@@ -11,7 +11,7 @@ export default function SuiRegistry({ children }: PropsWithChildren<any>) {
   return (
     <QueryClientProvider client={queryClient}>
       <SuiClientProvider networks={network} defaultNetwork="testnet">
-        <WalletProvider>{children}</WalletProvider>
+        <WalletProvider autoConnect>{children}</WalletProvider>
       </SuiClientProvider>
     </QueryClientProvider>
   );

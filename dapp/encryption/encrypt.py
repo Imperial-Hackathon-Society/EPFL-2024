@@ -1,11 +1,13 @@
-from flask import Flask 
-from flask import request
+from flask import Flask, request, jsonify
+from flask_cors import CORS, cross_origin
 import base64
 import hashlib
 from Crypto import Random
 from Crypto.Cipher import AES
 
 app = Flask(__name__)
+cors = CORS(app)
+app.config['CORS_HEADERS'] = 'Content-Type'
 
 class AESCipher(object):
 
@@ -33,20 +35,19 @@ class AESCipher(object):
         return s[:-ord(s[len(s)-1:])]
     
 @app.route("/encrypt", methods=["POST"])
+@cross_origin()
 # Encrypt data using RSA then return to frontend 
 def encrypt():
     key = request.json["key"]
     data = request.json["value"]
-    return AESCipher(key).encrypt(data) 
+    return jsonify(AESCipher(key).encrypt(data).decode("utf-8")) 
 
 @app.route("/decrypt", methods=["POST"])
+@cross_origin()
 # Decrypt data using RSA then return to frontend
 def decrypt():
     key = request.json["key"]
     data = request.json["value"]
-    return AESCipher(key).decrypt(data)
-
-# curl -X POST http://localhost:7385/encrypt -d '{"key": "mykey", "value": "mydata"}' -H "Content-Type: application/json"
-# curl -X POST http://localhost:7385/decrypt -d '{"key": "mykey", "value": "HnNvw6vxjJrzkunaamXLBlqSAOHFbu9PQ4ZXlYD6mc8="}' -H "Content-Type: application/json"
+    return jsonify(AESCipher(key).decrypt(data).decode("utf-8"))
 
 app.run(port=7385)
