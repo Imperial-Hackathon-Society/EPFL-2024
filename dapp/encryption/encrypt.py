@@ -49,3 +49,4 @@ def decrypt():
 # curl -X POST http://localhost:7385/encrypt -d '{"key": "mykey", "value": "mydata"}' -H "Content-Type: application/json"
 # curl -X POST http://localhost:7385/decrypt -d '{"key": "mykey", "value": "HnNvw6vxjJrzkunaamXLBlqSAOHFbu9PQ4ZXlYD6mc8="}' -H "Content-Type: application/json"
 
+app.run(port=7385)

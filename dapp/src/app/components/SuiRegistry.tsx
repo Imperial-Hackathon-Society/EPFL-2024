@@ -3,7 +3,7 @@
 import { SuiClientProvider, WalletProvider } from "@mysten/dapp-kit";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { PropsWithChildren } from "react";
-import { network } from "../util/networkConfig";
+import { network } from "../util/network";
 
 const queryClient = new QueryClient();
 

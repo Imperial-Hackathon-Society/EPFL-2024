@@ -13,21 +13,9 @@ type DoctorRequest = {
 export default function Home() {
   const [pendingDoctorRequests, setPendingDoctorRequests] = useState<
     DoctorRequest[]
-  >([
-    {
-      name: "John Doe",
-      date: new Date(),
-      encrypted_data: "encrypted_data",
-    },
-    {
-      name: "Jane Doe",
-      date: new Date(),
-      encrypted_data: "encrypted_data",
-    },
-  ]);
+  >([]);
 
   const account = useCurrentAccount();
-  
   const password = "freaky password";
 
   return (
@@ -37,17 +25,21 @@ export default function Home() {
         <Fragment>
           <h1>Patient Portal</h1>
           <div style={{ display: "flex", flexDirection: "row", gap: 2 }}>
-            <button onClick={async () => {
-              const data = await encrypt(password, "data");
-              setPendingDoctorRequests([
-                ...pendingDoctorRequests,
-                {
-                  name: account.address,
-                  date: new Date(),
-                  encrypted_data: data,
-                },
-              ]);
-            }}>Encrypt and Send to doctor</button>
+            <button
+              onClick={async () => {
+                const data = await encrypt(password, "data");
+                setPendingDoctorRequests([
+                  ...pendingDoctorRequests,
+                  {
+                    name: account.address,
+                    date: new Date(),
+                    encrypted_data: data,
+                  },
+                ]);
+              }}
+            >
+              Encrypt and Send to doctor
+            </button>
           </div>
         </Fragment>
       )}
