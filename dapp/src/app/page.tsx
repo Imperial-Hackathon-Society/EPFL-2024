@@ -2,6 +2,7 @@
 
 import { ConnectButton, useCurrentAccount } from "@mysten/dapp-kit";
 import { Fragment, useState } from "react";
+import { encrypt } from "./util/crypto";
 
 type DoctorRequest = {
   name: string;
@@ -26,8 +27,8 @@ export default function Home() {
   ]);
 
   const account = useCurrentAccount();
-
-  console.log(account);
+  
+  const password = "freaky password";
 
   return (
     <div>
@@ -36,7 +37,17 @@ export default function Home() {
         <Fragment>
           <h1>Patient Portal</h1>
           <div style={{ display: "flex", flexDirection: "row", gap: 2 }}>
-            <button>Encrypt and Send to doctor</button>
+            <button onClick={async () => {
+              const data = await encrypt(password, "data");
+              setPendingDoctorRequests([
+                ...pendingDoctorRequests,
+                {
+                  name: account.address,
+                  date: new Date(),
+                  encrypted_data: data,
+                },
+              ]);
+            }}>Encrypt and Send to doctor</button>
           </div>
         </Fragment>
       )}
