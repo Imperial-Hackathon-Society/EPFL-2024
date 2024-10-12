@@ -1,6 +1,12 @@
+
+*/archive
+
 # Next.js + npm gitignore
 
 # dependencies
 node_modules
 
 dapp_example
+
+*/data/*
+*/archive/*
