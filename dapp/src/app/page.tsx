@@ -1,14 +1,11 @@
 "use client";
 
-import {
-  ConnectButton,
-  useCurrentAccount,
-  useSignAndExecuteTransaction,
-  useSuiClient,
-} from "@mysten/dapp-kit";
+import { ConnectButton, useCurrentAccount } from "@mysten/dapp-kit";
 import { Fragment, useState } from "react";
 import { encrypt } from "./util/crypto";
 import { Transaction } from "@mysten/sui/transactions";
+import useTransaction from "./providers/transactionProvider";
+import { send } from "./util/transaction";
 
 type DoctorRequest = {
   name: string;
@@ -24,19 +21,7 @@ export default function Home() {
   const account = useCurrentAccount();
   const password = "freaky password";
 
-  const client = useSuiClient();
-
-  const { mutate: signAndExecute } = useSignAndExecuteTransaction({
-    execute: async ({ bytes, signature }) =>
-      await client.executeTransactionBlock({
-        transactionBlock: bytes,
-        signature,
-        options: {
-          showRawEffects: true,
-          showEffects: true,
-        },
-      }),
-  });
+  const signAndExecute = useTransaction();
 
   return (
     <div>
@@ -79,23 +64,13 @@ export default function Home() {
                 <p>{request.date.toLocaleString()}</p>
                 <button
                   onClick={() => {
-                    const tx = new Transaction();
-                    tx.moveCall({
-                      arguments: [],
-                      target: `${"0x7af34999d4a02ac64324e10335bd9c50b47d7f69b63474f6f76c03576672e67c"}::heathdata::create_collection`,
-                    });
-                    tx.setGasBudget(1000000000);
-                    signAndExecute(
-                      {
-                        transaction: tx,
-                      },
-                      {
-                        onSuccess: (result) => {
-                          console.log(result);
-                        },
-                        onError: (error) => {
-                          console.error(error);
-                        },
+                    send(
+                      signAndExecute,
+                      [],
+                      "healthdata::create_collection",
+                      10000000n,
+                      (result) => {
+                        console.log(result);
                       }
                     );
                   }}
