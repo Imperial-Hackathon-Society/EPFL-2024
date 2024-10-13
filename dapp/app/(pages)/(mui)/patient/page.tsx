@@ -2,14 +2,23 @@
 
 import Loading from "@/app/components/Loading";
 import {
+  Button,
   ButtonGroup,
+  FormControl,
+  FormLabel,
   IconButton,
+  Input,
   List,
   ListDivider,
   ListItem,
   ListItemContent,
   ListItemDecorator,
+  Modal,
+  ModalClose,
   Sheet,
+  Step,
+  StepIndicator,
+  Stepper,
   Typography,
 } from "@mui/joy";
 import { useZkLoginSession } from "@shinami/nextjs-zklogin/client";
@@ -24,13 +33,39 @@ type DoctorRequest = {
   id: string;
 };
 
-export default function PatientPage() {
-  const [requests, setRequests] = useState<DoctorRequest[]>([
-  ]);
+function CStep({ step, x, t }: { step: number; x: number; t: string }) {
+  const variant = x < step ? "solid" : x === step ? "outlined" : "soft";
 
+  return (
+    <Step
+      orientation="vertical"
+      indicator={
+        <StepIndicator
+          variant={variant}
+          sx={{
+            fontWeight: x === step ? "bold" : "normal",
+          }}
+        >
+          {x + 1}
+        </StepIndicator>
+      }
+      sx={{ fontWeight: x === step ? "bold" : "normal" }}
+    >
+      {t}
+    </Step>
+  );
+}
+
+export default function PatientPage() {
+  const [requests, setRequests] = useState<DoctorRequest[]>([]);
   const [updater, setUpdater] = useState(0);
 
-  const update = () => setUpdater(updater => updater + 1);
+  const [open, setOpen] = useState(false);
+  const [step, setStep] = useState(0);
+
+  const [reqId, setReqId] = useState<string>("");
+
+  const update = () => setUpdater((updater) => updater + 1);
 
   useEffect(() => {
     (async () => {
@@ -46,10 +81,88 @@ export default function PatientPage() {
   }, []);
 
   const { isLoading } = useZkLoginSession();
-  if (isLoading) return <Loading />; 
+  if (isLoading) return <Loading />;
 
   return (
     <div className="centered fadein">
+      <Modal
+        aria-labelledby="close-modal-title"
+        open={open}
+        onClose={(_event: React.MouseEvent<HTMLButtonElement>) => {
+          setOpen(false);
+        }}
+        sx={{ display: "flex", alignItems: "center", justifyContent: "center" }}
+      >
+        <Sheet
+          variant="outlined"
+          sx={{ minWidth: 600, borderRadius: "md", p: 3 }}
+        >
+          <Typography
+            component="h2"
+            id="close-modal-title"
+            level="h4"
+            textColor="inherit"
+            sx={{ fontWeight: "lg", mb: 4 }}
+          >
+            Request Submitted
+          </Typography>
+          <Stepper sx={{ width: "100%" }}>
+            <CStep step={step} x={0} t="Password" />
+            <CStep step={step} x={1} t="Processing Data" />
+            <CStep step={step} x={2} t="Signing Transaction" />
+          </Stepper>
+
+          {step === 0 && (
+            <FormControl>
+              <Input
+                type="password"
+                placeholder="Password"
+                sx={{ width: "100%", mt: 4, pointerEvents: "all" }}
+                required
+              />
+              <Button
+                sx={{ mt: 2 }}
+                onClick={async () => {
+                  setStep(1);
+                  const res1 = await fetch("/api/req_reply", {
+                    method: "POST",
+                    headers: {
+                      "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ id: reqId }),
+                  });
+                  update();
+
+                  const theReq = await res1.json();
+                  const res = await fetch("http://localhost:5001", {
+                    method: "POST",
+                    headers: {
+                      "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ value: theReq.data }),
+                  });
+                  const data = await res.json();
+                  console.log(data);
+                  setStep(2);
+                }}
+              >
+                Next
+              </Button>
+            </FormControl>
+          )}
+          {(step === 1 || step === 2) && (
+            <div
+              style={{
+                width: "100%",
+                minHeight: "100px",
+                position: "relative",
+              }}
+            >
+              <Loading />
+            </div>
+          )}
+        </Sheet>
+      </Modal>
       <Sheet
         sx={{
           padding: 6,
@@ -58,12 +171,12 @@ export default function PatientPage() {
         }}
       >
         <Typography sx={{ fontSize: "3rem", fontWeight: "bold", mb: 2 }}>
-          Approval Requests
+          Patient: Approval Requests
         </Typography>
         <List component="nav" sx={{ minWidth: 500 }}>
           {requests.map((request, i) => (
-            <Fragment>
-              <ListItem key={i}>
+            <Fragment key={i}>
+              <ListItem>
                 <ListItemContent>
                   <Typography sx={{ fontSize: "2rem" }}>
                     {request.title} ({new Date(request.date).toLocaleString()})
@@ -71,28 +184,28 @@ export default function PatientPage() {
                 </ListItemContent>
                 <ListItemDecorator>
                   <ButtonGroup variant="soft" size="lg">
-                    <IconButton onClick={async () => {
-                      await fetch("/api/req_reply", {
-                        method: "POST",
-                        headers: {
-                          "Content-Type": "application/json",
-                        },
-                        body: JSON.stringify({ id: request.id, reply: true }),
-                      });
-                      update();
-                    }}>
+                    <IconButton
+                      onClick={async () => {
+                        setReqId(request.id);
+                        setOpen(true);
+                      }}
+                    >
                       <Check />
                     </IconButton>
-                    <IconButton onClick={async () => {
-                      await fetch("/api/req_reply", {
-                        method: "POST",
-                        headers: {
-                          "Content-Type": "application/json",
-                        },
-                        body: JSON.stringify({ id: request.id, reply: false }),
-                      });
-                      update();
-                    }}>
+                    <IconButton
+                      onClick={async () => {
+                        await fetch("/api/req_reply", {
+                          method: "POST",
+                          headers: {
+                            "Content-Type": "application/json",
+                          },
+                          body: JSON.stringify({
+                            id: request.id,
+                          }),
+                        });
+                        update();
+                      }}
+                    >
                       <X />
                     </IconButton>
                   </ButtonGroup>
