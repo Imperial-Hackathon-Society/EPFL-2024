@@ -21,5 +21,5 @@ export async function POST(req: Request) {
     dataArr.map((req) => JSON.stringify(req)).join("\n") + "\n"
   );
 
-  return Response.json({ data: theReq.data });
+  return Response.json({ data: theReq });
 }

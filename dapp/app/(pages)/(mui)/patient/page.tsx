@@ -1,6 +1,8 @@
 "use client";
 
 import Loading from "@/app/components/Loading";
+import useMultisigTransaction from "@/app/hooks/useMultisig";
+import { send } from "@/lib/shared/transaction";
 import {
   Button,
   ButtonGroup,
@@ -62,6 +64,7 @@ export default function PatientPage() {
 
   const [open, setOpen] = useState(false);
   const [step, setStep] = useState(0);
+  const [res, setRes] = useState<any>(null);
 
   const [reqId, setReqId] = useState<string>("");
 
@@ -80,6 +83,8 @@ export default function PatientPage() {
     return () => clearInterval(interval);
   }, []);
 
+  const signAndExecute = useMultisigTransaction();
+
   const { isLoading } = useZkLoginSession();
   if (isLoading) return <Loading />;
 
@@ -95,7 +100,7 @@ export default function PatientPage() {
       >
         <Sheet
           variant="outlined"
-          sx={{ minWidth: 600, borderRadius: "md", p: 3 }}
+          sx={{ width: 600, borderRadius: "md", p: 3 }}
         >
           <Typography
             component="h2"
@@ -139,11 +144,35 @@ export default function PatientPage() {
                     headers: {
                       "Content-Type": "application/json",
                     },
-                    body: JSON.stringify({ value: theReq.data }),
+                    body: JSON.stringify({ value: theReq.data.data }),
                   });
                   const data = await res.json();
                   console.log(data);
+                  setRes(data);
                   setStep(2);
+
+                  // Wait for the data to be processed
+                  setTimeout(() => {
+                    setStep(3);
+                  }, 1000);
+
+                  return;
+
+                  send(
+                    signAndExecute,
+                    (tx) => [
+                      // tx.object(
+                      //   "0xd057d067fde385314a63580becbbdd3da7a2bbc6d2d6e07d787ae2c6a04f0daf"
+                      // ),
+                      // tx.pure.address(theReq.name),
+                      // tx.pure.vector("u8", new Uint8Array([1, 2, 3, 4])),
+                    ],
+                    "healthdata::add_illness_block",
+                    10000000n,
+                    (result) => {
+                      console.log(result);
+                    }
+                  );
                 }}
               >
                 Next
@@ -160,6 +189,13 @@ export default function PatientPage() {
             >
               <Loading />
             </div>
+          )}
+          {step === 3 && (
+            <Typography sx={{ mt: 4 }}>
+              Transaction has been submitted to the blockchain. The <strong>AI model</strong> has
+              predicted that you may be suffering from <strong>{res.decrypted_result}</strong>. Please
+              consult a doctor for further diagnosis.
+            </Typography>
           )}
         </Sheet>
       </Modal>
