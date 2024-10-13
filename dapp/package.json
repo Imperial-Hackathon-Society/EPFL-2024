@@ -1,34 +1,25 @@
 {
-  "name": "dapp",
-  "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next",
     "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
+    "start": "next start"
   },
   "dependencies": {
     "@emotion/react": "^11.13.3",
     "@emotion/styled": "^11.13.0",
     "@mui/joy": "^5.0.0-beta.48",
     "@mysten/dapp-kit": "^0.14.25",
-    "@mysten/sui": "^1.12.0",
-    "@mysten/zklogin": "^0.7.22",
     "@shinami/nextjs-zklogin": "^0.4.1",
-    "@tanstack/react-query": "^5.59.13",
-    "jwt-decode": "^4.0.0",
     "lucide-react": "^0.452.0",
-    "next": "14.2.15",
-    "react": "^18",
-    "react-dom": "^18"
+    "next": "latest",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
   },
   "devDependencies": {
-    "@types/node": "^20",
-    "@types/react": "^18",
-    "@types/react-dom": "^18",
-    "eslint": "^8",
-    "eslint-config-next": "14.2.15",
-    "typescript": "^5"
+    "@types/node": "^18.0.0",
+    "@types/react": "^18.0.14",
+    "@types/react-dom": "^18.0.5",
+    "typescript": "^5.2.2"
   }
 }
