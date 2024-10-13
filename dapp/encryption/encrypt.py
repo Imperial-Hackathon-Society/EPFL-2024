@@ -30,9 +30,6 @@ serialized_evaluation_keys = client.get_serialized_evaluation_keys()
 
 
 def helper(data):
-    print(data)
-    print(np.array([data]))
-    print(np.random.rand(1, 20))
     encrypted_data = client.quantize_encrypt_serialize(np.array([data]))
     # Make new request to the server
     try:

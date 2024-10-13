@@ -45,11 +45,8 @@ def predict():
         # print(encrypted_data)
         # Server processes the encrypted data
         encrypted_result = server.run(encrypted_data, serialized_evaluation_keys)
-        print(encrypted_result)
         # Return the prediction as a JSON response
         results = encrypted_result
-
-        print(results)
         return jsonify({'encrypted_result': base64.b64encode(results).decode('ascii')}), 200
     except Exception as e:
         print(e)
