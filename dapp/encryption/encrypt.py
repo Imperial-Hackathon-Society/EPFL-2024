@@ -10,7 +10,7 @@ app = Flask(__name__)
 cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
 FHE_DIRECTORY = './dapp/encryption/tmp/fhe_client_server_files/'
-URL = "http://127.0.0.1:5000/predict"
+URL = "http://127.0.0.1:5002/predict"
 
 labels = [
     "Hypertension",
@@ -30,7 +30,10 @@ serialized_evaluation_keys = client.get_serialized_evaluation_keys()
 
 
 def helper(data):
-    encrypted_data = client.quantize_encrypt_serialize(data)
+    print(data)
+    print(np.array([data]))
+    print(np.random.rand(1, 20))
+    encrypted_data = client.quantize_encrypt_serialize(np.array([data]))
     # Make new request to the server
     try:
         response = requests.post(URL, headers={"Content-Type": "application/json"}, data=json.dumps({"value": base64.b64encode(encrypted_data).decode('ascii')}))
