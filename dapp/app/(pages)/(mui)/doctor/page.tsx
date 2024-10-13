@@ -7,6 +7,9 @@ import {
   FormLabel,
   Grid,
   Input,
+  Modal,
+  ModalClose,
+  ModalDialog,
   Sheet,
   Tab,
   TabList,
@@ -19,9 +22,10 @@ import { useState } from "react";
 
 export default function DoctorPage() {
   const [name, setName] = useState("");
+  const [open, setOpen] = useState(false);
 
   const { user, isLoading } = useZkLoginSession();
-  if (isLoading) return <Loading />; 
+  if (isLoading) return <Loading />;
   if (!user) return <div>Not logged in</div>;
 
   function FormButton({ name, x }: { name: string; x: number }) {
@@ -70,6 +74,41 @@ export default function DoctorPage() {
         height: "90%",
       }}
     >
+      <Modal
+        aria-labelledby="close-modal-title"
+        open={open}
+        onClose={(
+          _event: React.MouseEvent<HTMLButtonElement>
+        ) => {
+          setOpen(false);
+        }}
+        sx={{ display: "flex", alignItems: "center", justifyContent: "center" }}
+      >
+        <Sheet
+          variant="outlined"
+          sx={{ minWidth: 300, borderRadius: "md", p: 3 }}
+        >
+          <ModalClose variant="outlined" />
+          <Typography
+            component="h2"
+            id="close-modal-title"
+            level="h4"
+            textColor="inherit"
+            sx={{ fontWeight: "lg" }}
+          >
+            Request Submitted!
+          </Typography>
+          <Button
+            size="lg"
+            color="primary"
+            variant="solid"
+            onClick={() => setOpen(false)}
+            sx={{ marginTop: 2, width: "100%" }}
+          >
+            Submit Another
+          </Button>
+        </Sheet>
+      </Modal>
       <Sheet
         sx={{
           padding: 1,
@@ -77,25 +116,28 @@ export default function DoctorPage() {
           border: "3px solid #000",
         }}
       >
+        <Typography sx={{ fontSize: "3rem", fontWeight: "bold", p: 1 }}>
+          Doctor Dashboard
+        </Typography>
         <Tabs>
           <TabList>
             <Tab color="neutral">
-              <Typography sx={{ fontSize: "1.5rem", fontWeight: "bold" }}>
+              <Typography sx={{ fontSize: "2rem", fontWeight: "bold" }}>
                 Patient Records
               </Typography>
             </Tab>
             <Tab color="neutral">
-              <Typography sx={{ fontSize: "1.5rem", fontWeight: "bold" }}>
+              <Typography sx={{ fontSize: "2rem", fontWeight: "bold" }}>
                 AI Inference
               </Typography>
             </Tab>
           </TabList>
           <TabPanel value={0} sx={{ maxHeight: "80vh", overflowY: "scroll" }}>
             <FormControl sx={{ mb: 4 }}>
-              <FormLabel sx={{ fontSize: "1.3rem" }}>Request Name</FormLabel>
+              <FormLabel sx={{ fontSize: "2rem" }}>Request Name</FormLabel>
               <Input
                 type="text"
-                sx={{ pointerEvents: "all" }}
+                sx={{ pointerEvents: "all", fontSize: "2rem" }}
                 id="name-input"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
@@ -105,6 +147,8 @@ export default function DoctorPage() {
             <form
               onSubmit={async (event) => {
                 event.preventDefault();
+                const button = document.getElementById("submit-button");
+                if (button) button.setAttribute("loading", "true");
                 const formData = new FormData(event.currentTarget);
                 const formJson = Object.fromEntries(
                   (formData as any).entries()
@@ -124,6 +168,9 @@ export default function DoctorPage() {
                     id: Math.random().toString(36).substring(7),
                   }),
                 });
+
+                setOpen(true);
+                if (button) button.setAttribute("loading", "false");
               }}
             >
               <Grid container spacing={2} sx={{ flexGrow: 1 }}>
@@ -156,6 +203,7 @@ export default function DoctorPage() {
                 size="lg"
                 color="primary"
                 variant="solid"
+                id="submit-button"
                 sx={{
                   marginTop: 4,
                   width: "100%",
