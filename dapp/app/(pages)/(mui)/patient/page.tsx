@@ -1,13 +1,11 @@
 "use client";
 
 import Loading from "@/app/components/Loading";
-import useMultisigTransaction from "@/app/hooks/useMultisig";
-import { send } from "@/lib/shared/transaction";
+import { useAddMutation } from "@/lib/shared/transaction";
 import {
   Button,
   ButtonGroup,
   FormControl,
-  FormLabel,
   IconButton,
   Input,
   List,
@@ -16,7 +14,6 @@ import {
   ListItemContent,
   ListItemDecorator,
   Modal,
-  ModalClose,
   Sheet,
   Step,
   StepIndicator,
@@ -83,7 +80,8 @@ export default function PatientPage() {
     return () => clearInterval(interval);
   }, []);
 
-  const signAndExecute = useMultisigTransaction();
+  const session = useZkLoginSession();
+  const { mutateAsync: add, isPending: isAdding } = useAddMutation();
 
   const { isLoading } = useZkLoginSession();
   if (isLoading) return <Loading />;
@@ -98,10 +96,7 @@ export default function PatientPage() {
         }}
         sx={{ display: "flex", alignItems: "center", justifyContent: "center" }}
       >
-        <Sheet
-          variant="outlined"
-          sx={{ width: 600, borderRadius: "md", p: 3 }}
-        >
+        <Sheet variant="outlined" sx={{ width: 600, borderRadius: "md", p: 3 }}>
           <Typography
             component="h2"
             id="close-modal-title"
@@ -151,28 +146,12 @@ export default function PatientPage() {
                   setRes(data);
                   setStep(2);
 
-                  // Wait for the data to be processed
-                  setTimeout(() => {
-                    setStep(3);
-                  }, 1000);
+                  const result = await add({
+                    data: data.encrypted_result,
+                    keyPair: session.localSession?.ephemeralKeyPair,
+                  });
 
-                  return;
-
-                  send(
-                    signAndExecute,
-                    (tx) => [
-                      // tx.object(
-                      //   "0xd057d067fde385314a63580becbbdd3da7a2bbc6d2d6e07d787ae2c6a04f0daf"
-                      // ),
-                      // tx.pure.address(theReq.name),
-                      // tx.pure.vector("u8", new Uint8Array([1, 2, 3, 4])),
-                    ],
-                    "healthdata::add_illness_block",
-                    10000000n,
-                    (result) => {
-                      console.log(result);
-                    }
-                  );
+                  setStep(3);
                 }}
               >
                 Next
@@ -192,9 +171,10 @@ export default function PatientPage() {
           )}
           {step === 3 && (
             <Typography sx={{ mt: 4 }}>
-              Transaction has been submitted to the blockchain. The <strong>AI model</strong> has
-              predicted that you may be suffering from <strong>{res.decrypted_result}</strong>. Please
-              consult a doctor for further diagnosis.
+              Transaction has been submitted to the blockchain. The{" "}
+              <strong>AI model</strong> has predicted that you may be suffering
+              from <strong>{res.decrypted_result}</strong>. Please consult a
+              doctor for further diagnosis.
             </Typography>
           )}
         </Sheet>

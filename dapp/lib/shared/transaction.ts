@@ -1,33 +1,41 @@
-import { Transaction } from "@mysten/sui/transactions";
-import { on } from "events";
+import {
+  apiTxExecMutationFn,
+  WithKeyPair,
+} from "@shinami/nextjs-zklogin/client";
+import {
+  UseMutationResult,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
+import { RecentTxsResponse } from "./interfaces";
+import { mask } from "superstruct";
 
-const PACKAGE_ID =
-  "0x731a6cb64d4f4e2e8b71ab1a4aab9ba3898bc103b18e744f8d63cc9bfc38ed4a";
-
-function send(
-  signAndExecute: any,
-  args: (tx: Transaction) => any[],
-  target: string,
-  gasBudget: bigint,
-  onSuccess: (result: any) => void
-) {
-  const tx = new Transaction();
-  tx.moveCall({
-    arguments: args(tx),
-    target: `${PACKAGE_ID}::${target}`,
-  });
-  tx.setGasBudget(gasBudget);
-  signAndExecute(
-    {
-      transaction: tx,
+export function useAddMutation(): UseMutationResult<
+  any,
+  any,
+  any & WithKeyPair
+> {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: apiTxExecMutationFn({
+      baseUri: () => "/api/add",
+      body: ({ keyPair, ...req }) => req,
+    }),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ["api", "recent_txs"] });
     },
-    {
-      onSuccess,
-      onError: (error: any) => {
-        console.error("UH OH! ", error);
-      },
-    }
-  );
+  });
 }
 
-export { send };
+export function useRecentTxsQuery() {
+  return useQuery({
+    queryKey: ["api", "recent_txs"],
+    queryFn: async () => {
+      const resp = await fetch("/api/recent_txs");
+      if (resp.status !== 200)
+        throw new Error(`Failed to fetch recent txs. ${resp.status}`);
+      return mask(await resp.json(), RecentTxsResponse);
+    },
+  });
+}

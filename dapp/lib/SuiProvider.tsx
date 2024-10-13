@@ -13,7 +13,7 @@ export default function SuiProvider({ children }: PropsWithChildren<{}>) {
     <QueryClientProvider client={queryClient}>
       <ZkLoginSessionProvider>
         <SuiClientProvider networks={network} defaultNetwork="testnet">
-          <WalletProvider autoConnect>{children}</WalletProvider>
+          <WalletProvider autoConnect >{children}</WalletProvider>
         </SuiClientProvider>
       </ZkLoginSessionProvider>
     </QueryClientProvider>
