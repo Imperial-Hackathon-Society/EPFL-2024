@@ -9,7 +9,7 @@ import base64
 app = Flask(__name__)
 cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
-FHE_DIRECTORY = './dapp/encryption/tmp/fhe_client_server_files/'
+FHE_DIRECTORY = './tmp/fhe_client_server_files/'
 URL = "http://127.0.0.1:5002/predict"
 
 labels = [

@@ -12,36 +12,36 @@ import {
   Typography,
 } from "@mui/joy";
 import { Check, X } from "lucide-react";
-import { Fragment, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 
 type DoctorRequest = {
+  title: string;
   name: string;
   date: Date;
   data: string;
-  type: "encrypt" | "decrypt";
+  id: string;
 };
 
 export default function PatientPage() {
   const [requests, setRequests] = useState<DoctorRequest[]>([
-    {
-      name: "Doctor 179812",
-      date: new Date(),
-      data: "data",
-      type: "encrypt",
-    },
-    {
-      name: "Doctor 179812",
-      date: new Date(),
-      data: "data",
-      type: "encrypt",
-    },
-    {
-      name: "Doctor 179812",
-      date: new Date(),
-      data: "data",
-      type: "encrypt",
-    },
   ]);
+
+  const [updater, setUpdater] = useState(0);
+
+  const update = () => setUpdater(updater => updater + 1);
+
+  useEffect(() => {
+    (async () => {
+      const res = await fetch("/api/pat_get");
+      const data = await res.json();
+      setRequests(data);
+    })();
+  }, [updater]);
+
+  useEffect(() => {
+    const interval = setInterval(update, 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <div className="centered fadein">
@@ -61,15 +61,33 @@ export default function PatientPage() {
               <ListItem key={i}>
                 <ListItemContent>
                   <Typography sx={{ fontSize: "2rem" }}>
-                    Doctor 179812
+                    {request.title} ({new Date(request.date).toLocaleString()})
                   </Typography>
                 </ListItemContent>
                 <ListItemDecorator>
                   <ButtonGroup variant="soft" size="lg">
-                    <IconButton>
+                    <IconButton onClick={async () => {
+                      await fetch("/api/req_reply", {
+                        method: "POST",
+                        headers: {
+                          "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({ id: request.id, reply: true }),
+                      });
+                      update();
+                    }}>
                       <Check />
                     </IconButton>
-                    <IconButton>
+                    <IconButton onClick={async () => {
+                      await fetch("/api/req_reply", {
+                        method: "POST",
+                        headers: {
+                          "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({ id: request.id, reply: false }),
+                      });
+                      update();
+                    }}>
                       <X />
                     </IconButton>
                   </ButtonGroup>

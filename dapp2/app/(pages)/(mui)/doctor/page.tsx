@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  Button,
   FormControl,
   FormLabel,
   Grid,
@@ -12,35 +13,53 @@ import {
   Tabs,
   Typography,
 } from "@mui/joy";
+import { useZkLoginSession } from "@shinami/nextjs-zklogin/client";
+import { useState } from "react";
 
 export default function DoctorPage() {
+  const [name, setName] = useState("");
+
+  const { user, isLoading } = useZkLoginSession();
+  if (isLoading) return <div>Loading...</div>;
+  if (!user) return <div>Not logged in</div>;
+
   function FormButton({ name, x }: { name: string; x: number }) {
+    let formattedName = name.replace(/_/g, " ");
+    formattedName = formattedName.replace(/\b\w/g, (c) => c.toUpperCase());
+
     return (
-      <FormControl>
-        <FormLabel>
-          <Typography sx={{ fontSize: "1.3rem" }}>{name}</Typography>
-        </FormLabel>
-        <Input
-          type="number"
-          sx={{ pointerEvents: "all" }}
-          name={name}
-          defaultValue={x}
-          required
-          slotProps={{
-            input: {
-              min: 0,
-              max: 1,
-              step: 0.01,
-            },
-          }}
-        />
-      </FormControl>
+      <Grid xs={6}>
+        <FormControl>
+          <FormLabel>
+            <Typography sx={{ fontSize: "1.3rem" }}>{formattedName}</Typography>
+          </FormLabel>
+          <Input
+            type="number"
+            sx={{ pointerEvents: "all" }}
+            name={name}
+            defaultValue={x}
+            required
+            slotProps={{
+              input: {
+                min: 0,
+                max: 1,
+                step: 0.01,
+              },
+            }}
+          />
+        </FormControl>
+      </Grid>
     );
   }
 
-  const r = Array.from({ length: 20 }, () =>
-    parseFloat(Math.random().toFixed(2))
-  );
+  // const r = Array.from({ length: 20 }, () =>
+  //   parseFloat(Math.random().toFixed(2))
+  // );
+
+  const r = [
+    0.23, 0.46, 0.77, 0.43, 0.92, 0.1, 0.65, 0.11, 0.79, 0.82, 0.64, 0.24, 0.05,
+    0.71, 0.77, 0.02, 0.93, 0.82, 0.44, 0.77,
+  ];
 
   return (
     <div
@@ -69,20 +88,21 @@ export default function DoctorPage() {
                 AI Inference
               </Typography>
             </Tab>
-            <Tab color="neutral">
-              <Typography sx={{ fontSize: "1.5rem", fontWeight: "bold" }}>
-                Button 3
-              </Typography>
-            </Tab>
-            <Tab color="neutral">
-              <Typography sx={{ fontSize: "1.5rem", fontWeight: "bold" }}>
-                Button 4
-              </Typography>
-            </Tab>
           </TabList>
           <TabPanel value={0} sx={{ maxHeight: "80vh", overflowY: "scroll" }}>
+            <FormControl sx={{ mb: 4 }}>
+              <FormLabel sx={{ fontSize: "1.3rem" }}>Request Name</FormLabel>
+              <Input
+                type="text"
+                sx={{ pointerEvents: "all" }}
+                id="name-input"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+              />
+            </FormControl>
             <form
-              onSubmit={(event) => {
+              onSubmit={async (event) => {
                 event.preventDefault();
                 const formData = new FormData(event.currentTarget);
                 const formJson = Object.fromEntries(
@@ -90,20 +110,19 @@ export default function DoctorPage() {
                 );
                 const val = Object.values(formJson).map(parseFloat);
 
-                fetch("http://localhost:5001", {
+                await fetch("/api/doc_pat", {
                   method: "POST",
                   headers: {
                     "Content-Type": "application/json",
                   },
-                  body: JSON.stringify({ value: val }),
-                })
-                  .then((response) => response.json())
-                  .then((data) => {
-                    console.log("Success:", data);
-                  })
-                  .catch((error) => {
-                    console.error("Error:", error);
-                  });
+                  body: JSON.stringify({
+                    data: val,
+                    title: name,
+                    name: user.wallet,
+                    date: new Date(),
+                    id: Math.random().toString(36).substring(7),
+                  }),
+                });
               }}
             >
               <Grid container spacing={2} sx={{ flexGrow: 1 }}>
@@ -131,9 +150,22 @@ export default function DoctorPage() {
                 <FormButton name="Calcium_Level_normalized" x={r[18]} />
                 <FormButton name="Sodium_Level_normalized" x={r[19]} />
               </Grid>
-              <button type="submit">Submit</button>
+              <Button
+                type="submit"
+                size="lg"
+                color="primary"
+                variant="solid"
+                sx={{
+                  marginTop: 4,
+                  width: "100%",
+                  fontSize: "1.5rem",
+                }}
+              >
+                Submit
+              </Button>
             </form>
           </TabPanel>
+          <TabPanel value={1}></TabPanel>
         </Tabs>
       </Sheet>
     </div>
