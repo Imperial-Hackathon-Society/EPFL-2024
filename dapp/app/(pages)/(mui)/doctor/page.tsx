@@ -1,5 +1,6 @@
 "use client";
 
+import Loading from "@/app/components/Loading";
 import {
   Button,
   FormControl,
@@ -20,7 +21,7 @@ export default function DoctorPage() {
   const [name, setName] = useState("");
 
   const { user, isLoading } = useZkLoginSession();
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading) return <Loading />; 
   if (!user) return <div>Not logged in</div>;
 
   function FormButton({ name, x }: { name: string; x: number }) {

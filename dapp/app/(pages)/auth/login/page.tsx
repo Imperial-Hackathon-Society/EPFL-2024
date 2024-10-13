@@ -1,9 +1,8 @@
 "use client";
 
+import Loading from "@/app/components/Loading";
 import { sui } from "@/lib/hooks/sui";
-import {
-  GOOGLE_CLIENT_ID,
-} from "@/lib/shared/openid";
+import { GOOGLE_CLIENT_ID } from "@/lib/shared/openid";
 import { first } from "@/lib/shared/utils";
 import {
   getGoogleAuthUrl,
@@ -23,18 +22,19 @@ export default withNewZkLoginSession(
 
     // Render sign-in options based on what's configured.
     return (
-      <>
+      <div className="centered">
         {GOOGLE_CLIENT_ID && (
           <div>
             <button
+              className="button"
               onClick={() => {
                 void router.replace(
                   getGoogleAuthUrl(
                     session,
                     GOOGLE_CLIENT_ID!,
                     "google", // Update if moved to another path
-                    redirectTo!,
-                  ).toString(),
+                    redirectTo!
+                  ).toString()
                 );
               }}
             >
@@ -42,7 +42,8 @@ export default withNewZkLoginSession(
             </button>
           </div>
         )}
-      </>
+      </div>
     );
   },
+  () => <Loading />
 );

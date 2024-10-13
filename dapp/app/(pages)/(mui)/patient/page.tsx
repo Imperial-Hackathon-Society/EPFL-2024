@@ -1,5 +1,6 @@
 "use client";
 
+import Loading from "@/app/components/Loading";
 import {
   ButtonGroup,
   IconButton,
@@ -11,6 +12,7 @@ import {
   Sheet,
   Typography,
 } from "@mui/joy";
+import { useZkLoginSession } from "@shinami/nextjs-zklogin/client";
 import { Check, X } from "lucide-react";
 import { Fragment, useEffect, useState } from "react";
 
@@ -42,6 +44,9 @@ export default function PatientPage() {
     const interval = setInterval(update, 1000);
     return () => clearInterval(interval);
   }, []);
+
+  const { isLoading } = useZkLoginSession();
+  if (isLoading) return <Loading />; 
 
   return (
     <div className="centered fadein">

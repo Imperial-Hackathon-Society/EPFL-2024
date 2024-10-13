@@ -4,13 +4,16 @@ import { AUTH_API_BASE, LOGIN_PAGE_PATH } from "@shinami/nextjs-zklogin";
 import { useZkLoginSession } from "@shinami/nextjs-zklogin/client";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import Loading from "../components/Loading";
 
 export default function LoginPage() {
   const router = useRouter();
+
   const { user, isLoading } = useZkLoginSession();
+  if (isLoading) return <Loading />; 
 
   return (
-    <div className="centered" style={{ width: "100%" }} id="maindiv">
+    <div className="centered just-load" style={{ width: "100%" }} id="maindiv">
       <div className="horizontal">
         <span className="plus">
           <div className="plus-x" />
