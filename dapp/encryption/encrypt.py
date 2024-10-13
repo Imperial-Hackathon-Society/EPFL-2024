@@ -46,7 +46,7 @@ def helper(data):
     decrypted_data = client.deserialize_decrypt_dequantize(encrypted_result)
 
     result = labels[np.argmax(decrypted_data)]
-    return json.dumps({"value": result}) 
+    return json.dumps({"decrypted_result": result, "encrypted_result": base64.b64encode(encrypted_result).decode('ascii'), "encrypted_data": base64.b64encode(encrypted_data).decode('ascii')}) 
 
 # encrypt the data
 @app.route("/", methods=["POST"])
